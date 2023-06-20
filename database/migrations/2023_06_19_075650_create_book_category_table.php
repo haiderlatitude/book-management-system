@@ -12,8 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('book_category', function (Blueprint $table) {
-            $table->foreign('book_id')->constrained()->cascadeOnDelete();
-            $table->foreign('category_id')->constrained()->cascadeOnDelete();
+            $table->id();
+            $table->unsignedBigInteger('book_id');
+            $table->unsignedBigInteger('category_id');
+            $table->foreign('book_id')->references('id')->on('books')->cascadeOnDelete();
+            $table->foreign('category_id')->references('id')->on('categories')->cascadeOnDelete();
             $table->timestamps();
         });
     }

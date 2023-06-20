@@ -13,7 +13,7 @@ class Category extends Model
         return $this->belongsTo(Book::class);
     }
 
-    public function genres() {
+    public function genre() {
         return $this->belongsTo(Genre::class);
     }
 }

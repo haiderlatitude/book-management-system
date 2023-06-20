@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category_genre', function (Blueprint $table) {
-            $table->foreign('genre_id')->constrained()->cascadeOnDelete();
-            $table->foreign('category_id')->constrained()->cascadeOnDelete();
+        Schema::create('genres', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->unsignedBigInteger('book_id')->nullable();
+            $table->foreign('book_id')->references('id')->on('books')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('genre_category');
+        Schema::dropIfExists('genres');
     }
 };

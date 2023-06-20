@@ -9,6 +9,14 @@ class Book extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+        'isbn',
+        'summary',
+        'publish_date',
+        'author_id',
+    ];
+
     public function author(){
         return $this->belongsTo(Author::class);
     }
@@ -17,8 +25,8 @@ class Book extends Model
         return $this->hasMany(Category::class);
     }
 
-    public function editions(){
-        return $this->hasMany(Edition::class);
+    public function edition(){
+        return $this->hasOne(Edition::class);
     }
 
     public function genre() {

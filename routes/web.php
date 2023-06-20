@@ -35,6 +35,7 @@ Route::middleware('auth', 'verified')->group(function(){
     Route::get('/admin', [AdminBookController::class, 'index']);
     Route::get('/edit/{id}', [AdminBookController::class, 'showBook']);
     Route::get('/book-details', [AdminBookController::class, 'enterBookDetails']);
+    Route::get('/everything', [AdminBookController::class, 'showEverything']);
     Route::post('/assign-role', [AdminRolesAndPermissionsController::class, 'assignRole']);
     Route::post('/delete-role', [AdminRolesAndPermissionsController::class, 'destroy']);
     Route::post('/remove-role', [AdminRolesAndPermissionsController::class, 'removeRole']);

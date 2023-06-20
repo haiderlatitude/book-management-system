@@ -3,15 +3,19 @@ $(document).ready(function(){
     $("form#storeBook").submit(function(e){
         e.preventDefault();
         
-        let name, edition, author, year, category, token;
-        name = $('#name').val();
+        let title, edition, isbn, token, author, publishingYear, summary, tags;
+        
+        title = $('#title').val();
+        isbn = $('#isbn').val();
         edition = $('#edition').val();
         author = $('#author').val();
-        year = $('#year').val();
-        category = $('#category').val();
+        publishingYear = $('#year').val();
         token = $('#token').val();
+        tags = $('#tags').val();
+        summary = $('#summary').val();
         
-        if(name == "" || year == "" || author == "" || edition == "" || category == ""){
+        
+        if(title == "" || publishingYear == "" || author == "" || edition == "" || isbn == "" || tags == "" || summary == ""){
             Swal.fire({
                 icon: 'error',
                 title: 'All fields are required!',
@@ -19,7 +23,7 @@ $(document).ready(function(){
             });
         }
 
-        else if(!(isNaN(year) && isNaN(edition))){
+        else if(!(isNaN(publishingYear) && isNaN(edition) && isNaN(isbn))){
             $.ajax({
                 url: '/store',
                 method: 'post',
@@ -27,11 +31,13 @@ $(document).ready(function(){
                     'X-CSRF-TOKEN': token,
                 },
                 data: {
-                    name: name,
+                    title: title,
                     edition: edition,
                     author: author,
-                    year: year,
-                    category: category,
+                    publishingYear: publishingYear,
+                    isbn: isbn,
+                    tags: tags,
+                    summary: summary,
                 },
     
                 success: function(response){
@@ -62,7 +68,7 @@ $(document).ready(function(){
         else{
             Swal.fire({
                 icon: 'error',
-                title: 'Year and Edition fields must be a Number!',
+                title: 'Year, Edition and ISBN fields must be a Number!',
                 confirmButtonColor: '#3b82f6',
             });
         }

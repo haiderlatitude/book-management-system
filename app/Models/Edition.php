@@ -9,6 +9,10 @@ class Edition extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'number',
+    ];
+
     public function book(){
         return $this->belongsTo(Book::class);
     }

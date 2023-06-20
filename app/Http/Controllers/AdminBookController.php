@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Author;
 use Illuminate\Http\Request;
 use App\Models\Book;
-use Exception;
+use App\Models\Category;
+use App\Models\Edition;
+use App\Models\Genre;
+use App\Models\Tag;
 
 class AdminBookController extends Controller
 {
@@ -13,8 +17,18 @@ class AdminBookController extends Controller
         return view('admin.index', compact('books'));
     }
 
+    function showEverything() {
+        $categories = Category::all();
+        $authors = Author::all();
+        $editions = Edition::all();
+        $genres = Genre::all();
+        $tags = Tag::all();
+        return view('admin.everything', ['authors' => $authors, 'categories' => $categories, 'editions' => $editions, 'genres' => $genres, 'tags' => $tags]);
+    }
+
     function enterBookDetails(){
-        return view('admin.enterBookDetails');
+        $genres = Genre::all();
+        return view('admin.enterBookDetails', compact('genres'));
     }
 
     function showBook($id){
@@ -23,20 +37,23 @@ class AdminBookController extends Controller
     }
 
     function store(Request $req){
-            if(!(ctype_digit($req->edition) && ctype_digit($req->year))){
+            if(!(ctype_digit($req->edition) && ctype_digit($req->publishingYear) && ctype_digit($req->isbn))){
                 return response([
                     'type' => 'error',
-                    'message' => 'Year and Edition fields must be a Number!',
+                    'message' => 'Year, Edition and ISBN fields must be a Number!',
                 ]);
             }
             else{
                 $book = new Book();
-                $book['name'] = $req['name'];
-                $book['edition'] = $req['edition'];
-                $book['year'] = $req['year'];
-                $book['author'] = $req['author'];
-                $book['category'] = $req['category'];
+                $book['title'] = $req['title'];
+                $book['isbn'] = $req['isbn'];
+                $book['publish_date'] = $req['publishingYear'];
+                $book['summary'] = $req['summary'];
                 $book->save();
+                $edition = $book->edition()->create(['number' => $req['edition']]);
+                $book->edition()->save($edition);
+                $author = $book->author()->create(['name' => ($req['author'])]);
+                $author->books()->save($book);
                 return response([
                     'type' => 'success',
                     'message' => 'Book has been saved successfully!',
