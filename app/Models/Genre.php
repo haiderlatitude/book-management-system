@@ -9,10 +9,6 @@ class Genre extends Model
 {
     use HasFactory;
 
-    public function book() {
-        return $this->belongsTo(Book::class);
-    }
-
     public function categories() {
         return $this->hasMany(Category::class);
     }

@@ -38,12 +38,31 @@
                                 <td class="text-start px-5 py-3 border border-slate-200 text-sm">{{$book->edition->number}}</td>
                                 <td class="text-start px-5 py-3 border border-slate-200 text-sm">{{$book->author->name}}</td>
                                 <td class="text-start px-5 py-3 border border-slate-200 text-sm">{{$book->publish_date}}</td>
-                                <td class="text-start px-5 py-3 border border-slate-200 text-sm">$book->genre</td>
-                                <td class="text-start px-5 py-3 border border-slate-200 text-sm">$book->categories</td>
-                                <td class="text-start px-5 py-3 border border-slate-200 text-sm">$book->tags</td>
+                                <td class="text-start px-5 py-3 border border-slate-200 text-sm">
+                                    @foreach ($book->categories as $category)
+                                        {{$category->genre->name}}
+                                        @break
+                                    @endforeach
+                                </td>
+                                <td class="text-start px-5 py-3 border border-slate-200 text-sm">
+                                    @foreach ($book->categories as $category)
+                                        {{$category->name}}
+                                        @if(!$category == $loop->last)
+                                        ,
+                                        @endif
+                                    @endforeach
+                                </td>
+                                <td class="text-start px-5 py-3 border border-slate-200 text-sm">
+                                    @foreach ($book->tags as $tag)
+                                        {{$tag->name}}
+                                        @if(!$tag == $loop->last)
+                                        ,
+                                        @endif
+                                    @endforeach
+                                </td>
                             @can('update book')
                             <td class="text-start px-5 py-3 border border-slate-200 text-sm">
-                                <button class="bg-blue-500 rounded-md px-2.5 py-1 my-1 text-sm text-white hover:bg-blue-700" type="submit" onclick="$(this).editBook('{{$book->id}}', '{{csrf_token()}}', '{{$book->name}}', '{{$book->edition}}', '{{$book->author}}', '{{$book->year}}', '{{$book->category}}')" name="edit" value="edit">Edit</button>
+                                <button class="bg-blue-500 rounded-md px-2.5 py-1 my-1 text-sm text-white hover:bg-blue-700" type="submit" onclick="$(this).editBook('{{$book->id}}', '{{csrf_token()}}', '{{$book->title}}', '{{$book->edition->number}}', '{{$book->author->name}}', '{{$book->publishingYear}}')" name="edit" value="edit">Edit</button>
                             @endcan
                             @can('delete book')
                                 <button class="bg-red-500 rounded-md px-1 py-1 my-1 text-sm text-white hover:bg-red-700" type="submit" onclick="$(this).deleteBook('{{$book->id}}', '{{csrf_token()}}')" name="delete" value="delete">Delete</button>

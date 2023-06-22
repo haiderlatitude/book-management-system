@@ -10,6 +10,6 @@ class Tag extends Model
     use HasFactory;
 
     public function book() {
-        return $this->belongsTo(Book::class);
+        return $this->belongsToMany(Book::class);
     }
 }

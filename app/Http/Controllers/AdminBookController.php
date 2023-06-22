@@ -28,7 +28,8 @@ class AdminBookController extends Controller
 
     function enterBookDetails(){
         $genres = Genre::all();
-        return view('admin.enterBookDetails', compact('genres'));
+        $tags = Tag::all();
+        return view('admin.enterBookDetails', compact('genres', 'tags'));
     }
 
     function showBook($id){
@@ -45,15 +46,26 @@ class AdminBookController extends Controller
             }
             else{
                 $book = new Book();
+                $author = $book->author()->create(['name' => ($req['author'])]);
+                $edition = $book->edition()->create(['number' => $req['edition']]);
                 $book['title'] = $req['title'];
                 $book['isbn'] = $req['isbn'];
                 $book['publish_date'] = $req['publishingYear'];
                 $book['summary'] = $req['summary'];
+                $book->author()->associate($author);
+                $book->edition()->associate($edition);
                 $book->save();
-                $edition = $book->edition()->create(['number' => $req['edition']]);
-                $book->edition()->save($edition);
-                $author = $book->author()->create(['name' => ($req['author'])]);
-                $author->books()->save($book);
+                
+                foreach($req['categories'] as $categoryName){
+                    $category = Category::where('name', $categoryName)->first();
+                    $book->categories()->attach($category);
+                }
+
+                foreach($req['tags'] as $tagName){
+                    $tag = Tag::where('name', $tagName)->first();
+                    $book->tags()->attach($tag);
+                }
+                
                 return response([
                     'type' => 'success',
                     'message' => 'Book has been saved successfully!',

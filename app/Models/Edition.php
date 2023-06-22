@@ -13,7 +13,7 @@ class Edition extends Model
         'number',
     ];
 
-    public function book(){
-        return $this->belongsTo(Book::class);
+    public function books(){
+        return $this->hasMany(Book::class);
     }
 }

@@ -22,18 +22,14 @@ class Book extends Model
     }
 
     public function categories(){
-        return $this->hasMany(Category::class);
+        return $this->belongsToMany(Category::class);
     }
 
     public function edition(){
-        return $this->hasOne(Edition::class);
-    }
-
-    public function genre() {
-        return $this->hasOne(Genre::class);
+        return $this->belongsTo(Edition::class);
     }
 
     public function tags() {
-        return $this->hasMany(Tag::class);
+        return $this->belongsToMany(Tag::class);
     }
 }

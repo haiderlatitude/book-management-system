@@ -1,9 +1,23 @@
 $(document).ready(function(){
 
+    $('#genre').change(function(){
+        if($('#genre').val() == "choose-genre"){
+            $('.categoryDiv').hide();
+        }
+
+        else{
+            $('.categories').prop('checked', false);
+            let genre = $('#genre').val();
+            let genreId = "#"+genre;
+            $('.categoryDiv').hide();
+            $(genreId).show();
+        }
+    });
+
     $("form#storeBook").submit(function(e){
         e.preventDefault();
         
-        let title, edition, isbn, token, author, publishingYear, summary, tags;
+        let title, edition, isbn, genre, categories, token, author, publishingYear, summary, tags;
         
         title = $('#title').val();
         isbn = $('#isbn').val();
@@ -11,11 +25,17 @@ $(document).ready(function(){
         author = $('#author').val();
         publishingYear = $('#year').val();
         token = $('#token').val();
-        tags = $('#tags').val();
         summary = $('#summary').val();
+        genre = $('#genre').val();
+        categories = $('.categories:checked').map(function(){
+            return $(this).val();
+        }).get();
+        tags = $('.tags:checked').map(function(){
+            return $(this).val();
+        }).get();
         
         
-        if(title == "" || publishingYear == "" || author == "" || edition == "" || isbn == "" || tags == "" || summary == ""){
+        if(title == "" || publishingYear == "" || author == "" || edition == "" || genre == "" || tags == "" || isbn == "" || tags == "" || summary == ""){
             Swal.fire({
                 icon: 'error',
                 title: 'All fields are required!',
@@ -37,6 +57,8 @@ $(document).ready(function(){
                     publishingYear: publishingYear,
                     isbn: isbn,
                     tags: tags,
+                    genre: genre,
+                    categories: categories,
                     summary: summary,
                 },
     
@@ -57,8 +79,8 @@ $(document).ready(function(){
     
                 error: function(response){
                     Swal.fire({
-                        icon: response.type,
-                        title: response.message,
+                        icon: 'error',
+                        title: 'Some error occured!',
                         confirmButtonColor: '#3b82f6',
                     });
                 }
@@ -128,32 +150,41 @@ $(document).ready(function(){
     }
 
     $.fn.deleteBook = function(id, token) {
+        Swal.fire({
+            title: 'Are you sure, you really want to delete this book?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            confirmButtonColor: '#3b82f6',
+            cancelButtonColor: '#ef4444',
+            preConfirm: () => {
+                $.ajax({
+                    url: '/delete/' + id,
+                    method: 'delete',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                    },
         
-        $.ajax({
-            url: '/delete/' + id,
-            method: 'delete',
-            headers: {
-                'X-CSRF-TOKEN': token,
-            },
-
-            success: function(response){
-                Swal.fire({
-                    icon: 'success',
-                    title: response,
-                    confirmButtonColor: '#3b82f6',
-
-                    preConfirm: (input) => {
-                        window.location.href = '/admin';
+                    success: function(response){
+                        Swal.fire({
+                            icon: 'success',
+                            title: response,
+                            confirmButtonColor: '#3b82f6',
+        
+                            preConfirm: (input) => {
+                                window.location.href = '/admin';
+                            }
+                        });
+                    },
+        
+                    error: function(response){
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Some error occured, please try again later!',
+                            confirmButtonColor: '#3b82f6',
+                        })
                     }
                 });
-            },
-
-            error: function(response){
-                Swal.fire({
-                    icon: 'error',
-                    title: response,
-                    confirmButtonColor: '#3b82f6',
-                })
             }
         });
     }

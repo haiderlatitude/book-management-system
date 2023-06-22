@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         Category::factory(10)->create();
         // Edition::factory(10)->create();
         Genre::factory(2)->create();
-        // Tag::factory(10)->create();
+        Tag::factory(10)->create();
 
         $categories = Category::all();
         $genres = Genre::all();
