@@ -31,14 +31,14 @@ Route::middleware('auth', 'verified')->group(function(){
         Route::get('/all-users', [AdminUserController::class, 'index'])->name('all-users');
         Route::get('/roles-and-permissions', [AdminRolesAndPermissionsController::class, 'index'])
             ->name('roles-and-permissions');
-    });
+        Route::post('/assign-role', [AdminRolesAndPermissionsController::class, 'assignRole']);
+        Route::post('/delete-role', [AdminRolesAndPermissionsController::class, 'destroy']);
+        Route::post('/remove-role', [AdminRolesAndPermissionsController::class, 'removeRole']);
+        });
     Route::get('/admin', [AdminBookController::class, 'index']);
-    Route::get('/edit/{id}', [AdminBookController::class, 'showBook']);
     Route::get('/book-details', [AdminBookController::class, 'enterBookDetails']);
+    Route::get('/edit-book/{id}', [AdminBookController::class, 'editBookDetails']);
     Route::get('/everything', [AdminBookController::class, 'showEverything']);
-    Route::post('/assign-role', [AdminRolesAndPermissionsController::class, 'assignRole']);
-    Route::post('/delete-role', [AdminRolesAndPermissionsController::class, 'destroy']);
-    Route::post('/remove-role', [AdminRolesAndPermissionsController::class, 'removeRole']);
     Route::post('/store', [AdminBookController::class, 'store']);
     Route::put('/update/{id}', [AdminBookController::class, 'update']);
     Route::delete('/delete/{id}', [AdminBookController::class, 'destroy']);

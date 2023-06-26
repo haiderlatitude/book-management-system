@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer('publish_date');
             $table->unsignedBigInteger('author_id')->nullable();
             $table->unsignedBigInteger('edition_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('author_id')->references('id')->on('authors')->cascadeOnDelete();
             $table->foreign('edition_id')->references('id')->on('editions')->cascadeOnDelete();
             $table->timestamps();

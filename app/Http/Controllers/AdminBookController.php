@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Edition;
 use App\Models\Genre;
 use App\Models\Tag;
+use App\Models\User;
 
 class AdminBookController extends Controller
 {
@@ -29,12 +30,18 @@ class AdminBookController extends Controller
     function enterBookDetails(){
         $genres = Genre::all();
         $tags = Tag::all();
-        return view('admin.enterBookDetails', compact('genres', 'tags'));
+        $editions = Edition::all();
+        $authors = Author::all();
+        return view('admin.enterBookDetails', compact('genres', 'tags', 'editions', 'authors'));
     }
 
-    function showBook($id){
-        $book = Book::query()->find($id);
-        return view('admin.editBook', compact('book'));
+    function editBookDetails($id){
+        $book = Book::find($id);
+        $genres = Genre::all();
+        $tags = Tag::all();
+        $editions = Edition::all();
+        $authors = Author::all();
+        return view('admin.editBook', compact('book', 'genres', 'tags', 'editions', 'authors'));
     }
 
     function store(Request $req){
@@ -46,23 +53,25 @@ class AdminBookController extends Controller
             }
             else{
                 $book = new Book();
-                $author = $book->author()->create(['name' => ($req['author'])]);
-                $edition = $book->edition()->create(['number' => $req['edition']]);
+                $user = User::find($req['userid']);
+                $author = Author::firstOrCreate(['name' => $req['author']]);
+                $edition = Edition::firstOrCreate(['number' => $req['edition']]);
                 $book['title'] = $req['title'];
                 $book['isbn'] = $req['isbn'];
                 $book['publish_date'] = $req['publishingYear'];
                 $book['summary'] = $req['summary'];
+                $book->user()->associate($user);
                 $book->author()->associate($author);
                 $book->edition()->associate($edition);
                 $book->save();
                 
-                foreach($req['categories'] as $categoryName){
-                    $category = Category::where('name', $categoryName)->first();
+                foreach($req['categories'] as $categoryId){
+                    $category = Category::find($categoryId);
                     $book->categories()->attach($category);
                 }
 
-                foreach($req['tags'] as $tagName){
-                    $tag = Tag::where('name', $tagName)->first();
+                foreach($req['tags'] as $tagId){
+                    $tag = Tag::find($tagId);
                     $book->tags()->attach($tag);
                 }
                 
@@ -74,20 +83,34 @@ class AdminBookController extends Controller
     }
 
     function update($id, Request $req){
-        if(!(ctype_digit($req->edition) && ctype_digit($req->year))){
+        if(!(ctype_digit($req->edition) && ctype_digit($req->publishingYear) && ctype_digit($req->isbn))){
             return response([
                 'type' => 'error',
-                'message' => 'Year and Edition fields must be a Number!',
+                'message' => 'Year, Edition and ISBN fields must be a Number!',
             ]);
         }
         else{
             $book = Book::find($id);
-            $book['name'] = $req['name'];
-            $book['edition'] = $req['edition'];
-            $book['year'] = $req['year'];
-            $book['author'] = $req['author'];
-            $book['category'] = $req['category'];
+            $author = Author::firstOrCreate(['name' => $req['author']]);
+            $edition = Edition::firstOrCreate(['number' => $req['edition']]);
+            $book['title'] = $req['title'];
+            $book['isbn'] = $req['isbn'];
+            $book['publish_date'] = $req['publishingYear'];
+            $book['summary'] = $req['summary'];
+            $book->author()->associate($author);
+            $book->edition()->associate($edition);
             $book->save();
+            
+            foreach($req['categories'] as $categoryId){
+                $category = Category::find($categoryId);
+                $book->categories()->attach($category);
+            }
+
+            foreach($req['tags'] as $tagId){
+                $tag = Tag::find($tagId);
+                $book->tags()->attach($tag);
+            }
+            
             return response([
                 'type' => 'success',
                 'message' => 'Book has been updated successfully!',

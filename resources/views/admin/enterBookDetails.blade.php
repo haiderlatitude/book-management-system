@@ -6,22 +6,37 @@
                 <div>
                     <b>Enter book details</b>
                 </div>
-                <form style="width: 500px;" class="mx-auto my-5" id="storeBook" action="/store" method="post">
+                <form style="width: 550px;" class="mx-auto my-5" id="storeBook" action="/store" method="post">
                     <input type="hidden" id="token" value="{{csrf_token()}}">
-                        <label for="title" class="px-10 py-auto">Title:</label>
-                        <input class="rounded-lg float-right py-auto" type="text" name="title" id="title" placeholder="Enter the title"> <br><br>
+                    <input type="hidden" id="userId" value="{{auth()->user()->id}}">
+                        <label for="title" class="px-10">Title:</label>
+                        <input style="width:308px;" class="rounded-lg float-right py-auto" type="text" name="title" id="title" placeholder="Enter the title"> <br><br>
 
                         <label for="isbn" class="px-10 py-auto">ISBN:</label>
-                        <input class="rounded-lg float-right py-auto" type="text" name="isbn" id="isbn" placeholder="Enter ISBN - digits only"> <br><br>
+                        <input style="width:308px;" class="rounded-lg float-right py-auto" type="text" name="isbn" id="isbn" placeholder="Enter ISBN - digits only"> <br><br>
 
                         <label for="edition" class="px-10 py-auto">Edition:</label>
-                        <input class="rounded-lg float-right py-auto" type="text" name="edition" id="edition" placeholder="Edition Number"> <br><br>
+                        <button style="height: 42px; display: inline;" onclick="event.preventDefault(); $(this).toggleEdition();" onsubmit="return false;" class="bg-blue-500 rounded-md px-2 ml-1 text-white float-right">Add Edition</button> 
+                        <input style="width:204px;" class="hidden rounded-lg float-right py-auto" type="text" name="edition" id="edition" placeholder="Edition Number">
+                        <select style="width:204px;" class="rounded-lg float-right py-auto" name="editionSelection" id="editionSelection">
+                            <option value="chooseEdition">-- Choose Edition --</option>
+                            @foreach ($editions as $edition)
+                                <option value="{{$edition->number}}">{{$edition->number}}</option>
+                            @endforeach
+                        </select><br><br>
 
                         <label for="author" class="px-10 py-auto">Author:</label>
-                        <input class="rounded-lg float-right py-auto" type="text" name="author" id="author" placeholder="Author Name"> <br><br>
+                        <button style="height: 42px; display: inline;" onclick="event.preventDefault(); $(this).toggleAuthor();" class="bg-blue-500 rounded-md px-2 ml-1 text-white float-right">Add Author</button> 
+                        <input style="width:204px;" class="hidden rounded-lg float-right py-auto" type="text" name="author" id="author" placeholder="Author Name">
+                        <select style="width:204px;" class="rounded-lg float-right py-auto" name="authorSelection" id="authorSelection">
+                            <option value="chooseAuthor">-- Choose Author --</option>
+                            @foreach ($authors as $author)
+                                <option value="{{$author->name}}">{{$author->name}}</option>
+                            @endforeach
+                        </select><br><br>
 
                         <label for="genre" class="px-10">Genre:</label>
-                        <select name="genre" id="genre" class="rounded-lg float-right" style="width:208px;">
+                        <select name="genre" id="genre" class="rounded-lg float-right" style="width:308px;">
                             <option value="choose-genre" selected>Choose Genre</option>
                             @foreach ($genres as $genre)
                                 <option value="{{$genre->name}}">{{$genre->name}}</option>
@@ -32,27 +47,31 @@
                             <div class="hidden categoryDiv mx-8 my-5" id="{{$genre->name}}">
                                 <label for="categories">Select Categories:</label> <br>
                                 @foreach ($genre->categories as $category)
-                                    <input type="checkbox" class="categories mx-3 my-3" name="{{$category->name}}" id="{{$category->name}}" value="{{$category->name}}">
+                                <div style="display: inline;" class="mx-3">
+                                    <input type="checkbox" class="categories mx-3 my-3" name="{{$category->name}}" id="{{$category->id}}" value="{{$category->name}}">
                                     <label for="{{$category->name}}">{{$category->name}}</label>
+                                </div>
                                 @endforeach
                             </div>
                         @endforeach
 
                         <label for="year" class="px-10 py-auto">Publishing Year:</label>
-                        <input class="rounded-lg float-right py-auto" type="text" name="year" id="year" placeholder="Enter 4 digit year"> <br><br>
+                        <input style="width:308px;" class="rounded-lg float-right py-auto" type="text" name="year" id="year" placeholder="Enter 4 digit year"> <br><br>
 
                         <label for="summary" class="px-10 py-auto">Summary:</label>
-                        <input class="rounded-lg float-right py-auto" type="text" name="summary" id="summary" placeholder="A short summary"> <br><br>
+                        <input style="width:308px;" class="rounded-lg float-right py-auto" type="text" name="summary" id="summary" placeholder="A short summary"> <br><br>
 
                         <label for="tags" class="px-10 py-auto">Select Tags:</label>
                         <div class="mx-8 my-5">
                             @foreach ($tags as $tag)
-                                <input type="checkbox" name="{{$tag->name}}" id="{{$tag->name}}" class="tags mx-3 my-3" value="{{$tag->name}}">
-                                <label for="{{$tag->name}}">{{$tag->name}}</label>
+                                <div style="display: inline;" class="mx-3">
+                                    <input type="checkbox" name="{{$tag->name}}" id="{{$tag->id}}" class="tags mx-3 my-3" value="{{$tag->name}}">
+                                    <label for="{{$tag->name}}">{{$tag->name}}</label>
+                                </div>
                             @endforeach
                         </div>
 
-                        <button type="submit" name="save" value="save" class="bg-blue-500 hover:bg-blue-700 text-white rounded-lg px-4 py-2 my-5 mx-5 ">Save</button>
+                        <button type="submit" name="save" value="save" class="bg-blue-500 hover:bg-blue-700 text-white rounded-lg px-5 py-2 my-5 mx-10 ">Save</button>
                     </form>
                 </div>
             </div>

@@ -1,5 +1,46 @@
 $(document).ready(function(){
 
+    allCategoryDivIds = $('.categoryDiv').map(function(){ return $(this).attr('id'); });
+    allCategoryDivs = $('.categoryDiv');
+    genreValue = $('#genre').val();
+    for(i = 0; i < allCategoryDivIds.length; i++){
+        if(allCategoryDivIds[i] == genreValue){
+            allCategoryDivs.filter('#'+genreValue).show();
+        }
+    }
+
+    $.fn.toggleAuthor = function(){
+        if($('#authorSelection').hasClass('hidden')){
+            $('#authorSelection').removeClass('hidden');
+        }
+        else{
+            $('#authorSelection').addClass('hidden');
+        }
+
+        if($('#author').hasClass('hidden')){
+            $('#author').removeClass('hidden');
+        }
+        else{
+            $('#author').addClass('hidden');
+        }
+    }
+
+    $.fn.toggleEdition = function(){
+        if($('#editionSelection').hasClass('hidden')){
+            $('#editionSelection').removeClass('hidden');
+        }
+        else{
+            $('#editionSelection').addClass('hidden');
+        }
+
+        if($('#edition').hasClass('hidden')){
+            $('#edition').removeClass('hidden');
+        }
+        else{
+            $('#edition').addClass('hidden');
+        }
+    }
+
     $('#genre').change(function(){
         if($('#genre').val() == "choose-genre"){
             $('.categoryDiv').hide();
@@ -17,21 +58,22 @@ $(document).ready(function(){
     $("form#storeBook").submit(function(e){
         e.preventDefault();
         
-        let title, edition, isbn, genre, categories, token, author, publishingYear, summary, tags;
+        let userId, title, edition, isbn, genre, categories, token, author, publishingYear, summary, tags;
         
+        userId = $('#userId').val();
         title = $('#title').val();
         isbn = $('#isbn').val();
-        edition = $('#edition').val();
-        author = $('#author').val();
+        edition = $('#edition').val() == '' ? $('#editionSelection').val() : $('#edition').val();
+        author = $('#author').val() == '' ? $('#authorSelection').val() : $('#author').val();
         publishingYear = $('#year').val();
         token = $('#token').val();
         summary = $('#summary').val();
         genre = $('#genre').val();
         categories = $('.categories:checked').map(function(){
-            return $(this).val();
+            return $(this).attr('id');
         }).get();
         tags = $('.tags:checked').map(function(){
-            return $(this).val();
+            return $(this).attr('id');
         }).get();
         
         
@@ -51,6 +93,7 @@ $(document).ready(function(){
                     'X-CSRF-TOKEN': token,
                 },
                 data: {
+                    userid: userId,
                     title: title,
                     edition: edition,
                     author: author,
@@ -97,23 +140,36 @@ $(document).ready(function(){
 
     });
 
-    $.fn.editBook = function(id, token, oldName, oldEdition, oldAuthor, oldYear, oldCategory){
-        let name, author, edition, year, category;
+    $('form#editBook').submit(function(e){
+        e.preventDefault();
+
         Swal.fire({
-            title: "Enter the details:",
-            html: '<label for="name" class="float-left">Name:</label><input class="rounded-lg float-right" style="width:70%;" type="text" name="name" id="name" value="'+oldName+'"> <br><br><label for="edition" class="float-left">Edition:</label><input class="rounded-lg float-right" style="width:70%;" type="text" name="edition" id="edition" value="'+oldEdition+'"> <br><br><label for="author" class="float-left">Author:</label><input class="rounded-lg float-right" style="width:70%;" type="text" name="author" id="author" value="'+oldAuthor+'"> <br><br><label for="Year" class="float-left">Year:</label><input class="rounded-lg float-right" style="width:70%;" type="text" name="year" id="year" value="'+oldYear+'"> <br><br><label for="category" class="float-left">Category:</label><input class="rounded-lg float-right" style="width:70%;" type="text" name="category" id="category" value="'+oldCategory+'">',
+            title: "Are you sure you want to update the book details?",
+            icon: 'info',
             showCancelButton: true,
             cancelButtonColor: '#ef4444',
             confirmButtonColor: '#3b82f6',
             allowOutsideClick: false,
             preConfirm: (input) => {
-                name = $('#name').val();
-                year = $('#year').val();
-                author = $('#author').val();
-                edition = $('#edition').val();
-                category = $('#category').val();
+                let id, updatedTitle, updatedEdition, updatedIsbn, updatedGenre, updatedCategories, token, updatedAuthor, updatedPublishingYear, updatedSummary, updatedTags;
+                
+                id = $('#bookId').val();
+                updatedTitle = $('#title').val();
+                updatedIsbn = $('#isbn').val();
+                updatedEdition = $('#edition').val() == '' ? $('#editionSelection').val() : $('#edition').val();
+                updatedAuthor = $('#author').val() == '' ? $('#authorSelection').val() : $('#author').val();
+                updatedPublishingYear = $('#year').val();
+                token = $('#token').val();
+                updatedSummary = $('#summary').val();
+                updatedGenre = $('#genre').val();
+                updatedCategories = $('.categories:checked').map(function(){
+                    return $(this).attr('id');
+                }).get();
+                updatedTags = $('.tags:checked').map(function(){
+                    return $(this).attr('id');
+                }).get();
 
-                if(!isNaN(year) && !isNaN(edition)){
+                if(!(isNaN(updatedPublishingYear) && isNaN(updatedEdition) && isNaN(updatedIsbn))){
                     $.ajax({
                         url: '/update/'+id,
                         method: 'put',
@@ -121,11 +177,16 @@ $(document).ready(function(){
                             'X-CSRF-TOKEN': token
                         },
                         data: {
-                            name: name,
-                            author: author,
-                            year: year,
-                            edition:edition,
-                            category: category
+                            title: updatedTitle,
+                            isbn: updatedIsbn,
+                            author: updatedAuthor,
+                            publishingYear: updatedPublishingYear,
+                            edition: updatedEdition,
+                            genre: updatedGenre,
+                            categories: updatedCategories,
+                            summary: updatedSummary,
+                            tags: updatedTags,
+
                         },
             
                         success: function(response){
@@ -138,16 +199,25 @@ $(document).ready(function(){
                                 }
                             });
                         },
+
+                        error: function(){
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Some error occured!',
+                                confirmButtonColor: '#3b82f6',
+                                preConfirm: (input) =>{
+                                    window.location.href = '/admin';
+                                }
+                            });
+                        }
                     });
                 }
                 else{
-                    Swal.showValidationMessage('Year and Edition fields must be a Number!');
+                    Swal.showValidationMessage('Year, Edition and ISBN fields must be a Number!');
                 }
             }
-        });
-
-        
-    }
+        });    
+    });
 
     $.fn.deleteBook = function(id, token) {
         Swal.fire({
@@ -188,4 +258,4 @@ $(document).ready(function(){
             }
         });
     }
-})
+});
